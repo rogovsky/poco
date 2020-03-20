@@ -1,8 +1,6 @@
 //
 // Document.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Document
@@ -59,7 +57,7 @@ Int64 Document::getInteger(const std::string& name) const
 	if (ElementTraits<double>::TypeId == element->type())
 	{
 		ConcreteElement<double>* concrete = dynamic_cast<ConcreteElement<double>*>(element.get());
-		if (concrete) return concrete->value();
+		if (concrete) return static_cast<Int64>(concrete->value());
 	}
 	else if (ElementTraits<Int32>::TypeId == element->type())
 	{
@@ -86,7 +84,7 @@ void Document::read(BinaryReader& reader)
 	while (type != '\0')
 	{
 		Element::Ptr element;
-		
+
 		std::string name = BSONReader(reader).readCString();
 
 		switch (type)
@@ -200,7 +198,7 @@ void Document::write(BinaryWriter& writer)
 	else
 	{
 		std::stringstream sstream;
-		Poco::BinaryWriter tempWriter(sstream);
+		Poco::BinaryWriter tempWriter(sstream, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 		for (ElementSet::iterator it = _elements.begin(); it != _elements.end(); ++it)
 		{
 			tempWriter << static_cast<unsigned char>((*it)->type());
@@ -209,7 +207,7 @@ void Document::write(BinaryWriter& writer)
 			element->write(tempWriter);
 		}
 		tempWriter.flush();
-		
+
 		Poco::Int32 len = static_cast<Poco::Int32>(5 + sstream.tellp()); /* 5 = sizeof(len) + 0-byte */
 		writer << len;
 		writer.writeRaw(sstream.str());

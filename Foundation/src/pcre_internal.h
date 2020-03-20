@@ -231,7 +231,7 @@ by "configure". */
 
 #if HAVE_STDINT_H
 #include <stdint.h>
-#elif HAVE_INTTYPES_H
+#elif HAVE_INTTYPES_H || defined(__SUNPRO_C)
 #include <inttypes.h>
 #endif
 
@@ -2652,6 +2652,19 @@ typedef struct {
   pcre_uint16 value;
 } ucp_type_table;
 
+/* renamed to avoid clashes with system pcre */
+#define _pcre_utf8_table1      _poco_pcre_utf8_table1
+#define _pcre_utf8_table1_size _poco_pcre_utf8_table1_size
+#define _pcre_utf8_table2      _poco_pcre_utf8_table2
+#define _pcre_utf8_table3      _poco_pcre_utf8_table3
+#define _pcre_utf8_table4      _poco_pcre_utf8_table4
+#define _pcre_utt              _poco_pcre_utt
+#define _pcre_utt_size         _poco_pcre_utt_size
+#define _pcre_utt_names        _poco_pcre_utt_names
+#define _pcre_OP_lengths       _poco_pcre_OP_lengths
+#define _pcre_ucp_gbtable      _poco_pcre_ucp_gbtable
+#define _pcre_vspace_list      _poco_pcre_vspace_list
+#define _pcre_hspace_list      _poco_pcre_hspace_list
 
 /* Internal shared data tables. These are tables that are used by more than one
 of the exported public functions. They have to be "external" in the C sense,
@@ -2766,12 +2779,22 @@ typedef struct {
   pcre_int32 other_case; /* offset to other case, or zero if none */
 } ucd_record;
 
+/* renamed to avoid clashes with system pcre */
+#define _pcre_ucd_records _poco_pcre_ucd_records
+#define _pcre_ucd_stage1 _poco_pcre_ucd_stage1
+#define _pcre_ucd_stage2 _poco_pcre_ucd_stage2
+#define _pcre_ucp_gentype _poco_pcre_ucp_gentype
+#define _pcre_ucd_caseless_sets _poco_pcre_ucd_caseless_sets
+
 extern const pcre_uint32 PRIV(ucd_caseless_sets)[];
 extern const ucd_record  PRIV(ucd_records)[];
 extern const pcre_uint8  PRIV(ucd_stage1)[];
 extern const pcre_uint16 PRIV(ucd_stage2)[];
 extern const pcre_uint32 PRIV(ucp_gentype)[];
 extern const pcre_uint32 PRIV(ucp_gbtable)[];
+#ifdef COMPILE_PCRE32
+extern const ucd_record  PRIV(dummy_ucd_record)[];
+#endif
 #ifdef SUPPORT_JIT
 extern const int         PRIV(ucp_typerange)[];
 #endif
@@ -2780,9 +2803,15 @@ extern const int         PRIV(ucp_typerange)[];
 /* UCD access macros */
 
 #define UCD_BLOCK_SIZE 128
-#define GET_UCD(ch) (PRIV(ucd_records) + \
+#define REAL_GET_UCD(ch) (PRIV(ucd_records) + \
         PRIV(ucd_stage2)[PRIV(ucd_stage1)[(int)(ch) / UCD_BLOCK_SIZE] * \
         UCD_BLOCK_SIZE + (int)(ch) % UCD_BLOCK_SIZE])
+
+#ifdef COMPILE_PCRE32
+#define GET_UCD(ch) ((ch > 0x10ffff)? PRIV(dummy_ucd_record) : REAL_GET_UCD(ch))
+#else
+#define GET_UCD(ch) REAL_GET_UCD(ch)
+#endif
 
 #define UCD_CHARTYPE(ch)    GET_UCD(ch)->chartype
 #define UCD_SCRIPT(ch)      GET_UCD(ch)->script

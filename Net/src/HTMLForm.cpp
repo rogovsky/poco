@@ -1,8 +1,6 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.4/Net/src/HTMLForm.cpp#4 $
-//
 // Library: Net
 // Package: HTML
 // Module:  HTMLForm
@@ -56,11 +54,11 @@ public:
 	{
 	}
 
-	bool isValid() const 
+	bool isValid() const
 	{
 		return _valid;
 	}
-	
+
 	void setValid(bool v)
 	{
 		_valid = v;
@@ -78,7 +76,7 @@ HTMLForm::HTMLForm():
 {
 }
 
-	
+
 HTMLForm::HTMLForm(const std::string& encoding):
 	_fieldLimit(DFL_FIELD_LIMIT),
 	_valueLengthLimit(DFL_MAX_VALUE_LENGTH),
@@ -110,12 +108,12 @@ HTMLForm::HTMLForm(const HTTPRequest& request):
 	load(request);
 }
 
-	
+
 HTMLForm::~HTMLForm()
 {
-	for (PartVec::iterator it = _parts.begin(); it != _parts.end(); ++it)
+	for (auto& part: _parts)
 	{
-		delete it->pSource;
+		delete part.pSource;
 	}
 }
 
@@ -153,7 +151,7 @@ void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartH
 	{
 		std::string mediaType;
 		NameValueCollection params;
-		MessageHeader::splitParameters(request.getContentType(), mediaType, params); 
+		MessageHeader::splitParameters(request.getContentType(), mediaType, params);
 		_encoding = mediaType;
 		if (_encoding == ENCODING_MULTIPART)
 		{
@@ -205,7 +203,7 @@ void HTMLForm::read(const std::string& queryString)
 }
 
 
-void HTMLForm::prepareSubmit(HTTPRequest& request)
+void HTMLForm::prepareSubmit(HTTPRequest& request, int options)
 {
 	if (request.getMethod() == HTTPRequest::HTTP_POST || request.getMethod() == HTTPRequest::HTTP_PUT)
 	{
@@ -231,11 +229,11 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 			request.setKeepAlive(false);
 			request.setChunkedTransferEncoding(false);
 		}
-		else if (_encoding != ENCODING_URL)
+		else if (_encoding != ENCODING_URL && (options & OPT_USE_CONTENT_LENGTH) == 0)
 		{
 			request.setChunkedTransferEncoding(true);
 		}
-		if (!request.getChunkedTransferEncoding())
+		if (!request.getChunkedTransferEncoding() && !request.hasContentLength())
  		{
  			request.setContentLength(calculateContentLength());
  		}
@@ -389,7 +387,7 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 
 void HTMLForm::writeUrl(std::ostream& ostr)
 {
-	for (NameValueCollection::ConstIterator it = begin(); it != end(); ++it)
+	for (auto it = begin(); it != end(); ++it)
 	{
 		if (it != begin()) ostr << "&";
 		std::string name;
@@ -406,7 +404,7 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 	HTMLFormCountingOutputStream* pCountingOutputStream(dynamic_cast<HTMLFormCountingOutputStream*>(&ostr));
 
 	MultipartWriter writer(ostr, _boundary);
-	for (NameValueCollection::ConstIterator it = begin(); it != end(); ++it)
+	for (auto it = begin(); it != end(); ++it)
 	{
 		MessageHeader header;
 		std::string disp("form-data; name=\"");
@@ -415,14 +413,14 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 		header.set("Content-Disposition", disp);
 		writer.nextPart(header);
 		ostr << it->second;
-	}	
-	for (PartVec::iterator ita = _parts.begin(); ita != _parts.end(); ++ita)
+	}
+	for (const auto& part: _parts)
 	{
-		MessageHeader header(ita->pSource->headers());
+		MessageHeader header(part.pSource->headers());
 		std::string disp("form-data; name=\"");
-		disp.append(ita->name);
+		disp.append(part.name);
 		disp.append("\"");
-		std::string filename = ita->pSource->filename();
+		std::string filename = part.pSource->filename();
 		if (!filename.empty())
 		{
 			disp.append("; filename=\"");
@@ -430,20 +428,20 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 			disp.append("\"");
 		}
 		header.set("Content-Disposition", disp);
-		header.set("Content-Type", ita->pSource->mediaType());
+		header.set("Content-Type", part.pSource->mediaType());
 		writer.nextPart(header);
 		if (pCountingOutputStream)
 		{
 			// count only, don't move stream position
-			std::streamsize partlen = ita->pSource->getContentLength();
+			std::streamsize partlen = part.pSource->getContentLength();
 			if (partlen != PartSource::UNKNOWN_CONTENT_LENGTH)
-				pCountingOutputStream->addChars(static_cast<int>(partlen));
+				pCountingOutputStream->addChars(partlen);
 			else
 				pCountingOutputStream->setValid(false);
 		}
 		else
 		{
-			StreamCopier::copyStream(ita->pSource->stream(), ostr);
+			StreamCopier::copyStream(part.pSource->stream(), ostr);
 		}
 	}
 	writer.close();
@@ -454,7 +452,7 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 void HTMLForm::setFieldLimit(int limit)
 {
 	poco_assert (limit >= 0);
-	
+
 	_fieldLimit = limit;
 }
 
@@ -462,7 +460,7 @@ void HTMLForm::setFieldLimit(int limit)
 void HTMLForm::setValueLengthLimit(int limit)
 {
 	poco_assert (limit >= 0);
-	
+
 	_valueLengthLimit = limit;
 }
 

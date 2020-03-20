@@ -6,7 +6,7 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2016 University of Cambridge
+           Copyright (c) 1997-2018 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -5741,6 +5741,21 @@ for (;; ptr++)
       ptr = p - 1;    /* Character before the next significant one. */
       }
 
+    /* We also need to skip over (?# comments, which are not dependent on
+    extended mode. */
+
+    if (ptr[1] == CHAR_LEFT_PARENTHESIS && ptr[2] == CHAR_QUESTION_MARK &&
+        ptr[3] == CHAR_NUMBER_SIGN)
+      {
+      ptr += 4;
+      while (*ptr != CHAR_NULL && *ptr != CHAR_RIGHT_PARENTHESIS) ptr++;
+      if (*ptr == CHAR_NULL)
+        {
+        *errorcodeptr = ERR18;
+        goto FAILED;
+        }
+      }
+
     /* If the next character is '+', we have a possessive quantifier. This
     implies greediness, whatever the setting of the PCRE_UNGREEDY option.
     If the next character is '?' this is a minimizing repeat, by default,
@@ -7629,6 +7644,8 @@ for (;; ptr++)
         /* Can't determine a first byte now */
 
         if (firstcharflags == REQ_UNSET) firstcharflags = REQ_NONE;
+		zerofirstchar = firstchar;
+		zerofirstcharflags = firstcharflags;
         continue;
 
 
@@ -8047,7 +8064,7 @@ for (;; ptr++)
         single group (i.e. not to a duplicated name. */
 
         HANDLE_REFERENCE:
-        if (firstcharflags == REQ_UNSET) firstcharflags = REQ_NONE;
+        if (firstcharflags == REQ_UNSET) zerofirstcharflags = firstcharflags = REQ_NONE;
         previous = code;
         item_hwm_offset = cd->hwm - cd->start_workspace;
         *code++ = ((options & PCRE_CASELESS) != 0)? OP_REFI : OP_REF;
@@ -8212,7 +8229,6 @@ for (;; ptr++)
 
       if (mclength == 1 || req_caseopt == 0)
         {
-        firstchar = mcbuffer[0] | req_caseopt;
         firstchar = mcbuffer[0];
         firstcharflags = req_caseopt;
 
@@ -8670,10 +8686,17 @@ do {
      if (!is_anchored(scode, new_map, cd, atomcount)) return FALSE;
      }
 
-   /* Positive forward assertions and conditions */
+   /* Positive forward assertion */
 
-   else if (op == OP_ASSERT || op == OP_COND)
+   else if (op == OP_ASSERT)
      {
+     if (!is_anchored(scode, bracket_map, cd, atomcount)) return FALSE;
+     }
+
+   /* Condition; not anchored if no second branch */
+   else if (op == OP_COND)
+     {
+     if (scode[GET(scode,1)] != OP_ALT) return FALSE;
      if (!is_anchored(scode, bracket_map, cd, atomcount)) return FALSE;
      }
 
@@ -9781,4 +9804,3 @@ return (pcre32 *)re;
 }
 
 /* End of pcre_compile.c */
-

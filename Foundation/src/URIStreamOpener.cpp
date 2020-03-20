@@ -1,8 +1,6 @@
 //
 // URIStreamOpener.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URIStreamOpener.cpp#1 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URIStreamOpener
@@ -34,8 +32,7 @@ URIStreamOpener::URIStreamOpener()
 
 URIStreamOpener::~URIStreamOpener()
 {
-	for (FactoryMap::iterator it = _map.begin(); it != _map.end(); ++it)
-		delete it->second;
+	for (auto& p: _map) delete p.second;
 }
 
 

@@ -1,8 +1,6 @@
 //
 // MemoryPool.cpp
 //
-// $Id: //poco/1.4/Foundation/src/MemoryPool.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  MemoryPool
@@ -59,9 +57,9 @@ MemoryPool::~MemoryPool()
 
 void MemoryPool::clear()
 {
-	for (BlockVec::iterator it = _blocks.begin(); it != _blocks.end(); ++it)
+	for (auto p: _blocks)
 	{
-		delete [] *it;
+		delete [] p;
 	}
 	_blocks.clear();
 }

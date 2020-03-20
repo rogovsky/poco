@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/Makefile#4 $
-#
 # Makefile for Poco Foundation
 #
 
@@ -15,7 +13,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator DirectoryWatcher \
 	Environment Event EventChannel Error EventArgs ErrorHandler Exception FIFOBufferStream FPEnvironment File \
 	FileChannel Formatter FormattingChannel Glob HexBinaryDecoder LineEndingConverter \
-	HexBinaryEncoder InflatingStream Latin1Encoding Latin2Encoding Latin9Encoding LogFile \
+	HexBinaryEncoder InflatingStream JSONString Latin1Encoding Latin2Encoding Latin9Encoding LogFile \
 	Logger LoggingFactory LoggingRegistry LogStream NamedEvent NamedMutex NullChannel \
 	MemoryPool MD4Engine MD5Engine Manifest Message Mutex \
 	NestedDiagnosticContext Notification NotificationCenter \
@@ -23,7 +21,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	NullStream NumberFormatter NumberParser NumericString AbstractObserver \
 	Path PatternFormatter Process PurgeStrategy RWLock Random RandomStream \
 	DirectoryIteratorStrategy RegularExpression RefCountedObject Runnable RotateStrategy \
-	SHA1Engine Semaphore SharedLibrary SimpleFileChannel \
+	SHA1Engine SHA2Engine Semaphore SharedLibrary SimpleFileChannel \
 	SignalHandler SplitterChannel SortedDirectoryIterator Stopwatch StreamChannel \
 	StreamConverter StreamCopier StreamTokenizer String StringTokenizer SynchronizedObject \
 	Task TaskManager TaskNotification TeeStream Hash HashStatistic \
@@ -32,7 +30,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF32Encoding UTF16Encoding UTF8Encoding UTF8String \
 	Unicode UnicodeConverter Windows1250Encoding Windows1251Encoding Windows1252Encoding \
 	UUID UUIDGenerator Void Var VarHolder VarIterator Format Pipe PipeImpl PipeStream SharedMemory \
-	MemoryStream FileStream AtomicCounter 
+	MemoryStream FileStream AtomicCounter DataURIStream DataURIStreamFactory
 
 zlib_objects = adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil

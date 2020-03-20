@@ -1,8 +1,6 @@
 //
 // Error.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Error.cpp#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Error
@@ -38,15 +36,9 @@ namespace Poco {
 	{
 		std::string errMsg;
 		DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
-	#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		LPWSTR lpMsgBuf = 0;
 		if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL))
 			UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
-	#else
-		LPTSTR lpMsgBuf = 0;
-		if (FormatMessageA(dwFlg, 0, errorCode, 0, (LPTSTR) & lpMsgBuf, 0, NULL))
-			errMsg = lpMsgBuf;
-	#endif
 		LocalFree(lpMsgBuf);
 		return errMsg;
 	}
@@ -70,7 +62,7 @@ namespace Poco {
 		{
 			_buffer[0] = 0;
 
-#if (_XOPEN_SOURCE >= 600) || POCO_ANDROID || __APPLE__
+#if (_XOPEN_SOURCE >= 600) || POCO_OS == POCO_OS_ANDROID || __APPLE__
 			setMessage(strerror_r(err, _buffer, sizeof(_buffer)));
 #elif _GNU_SOURCE
 			setMessage(strerror_r(err, _buffer, sizeof(_buffer)));

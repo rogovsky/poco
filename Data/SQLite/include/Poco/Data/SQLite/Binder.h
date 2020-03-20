@@ -1,8 +1,6 @@
 //
 // Binder.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/Binder.h#4 $
-//
 // Library: Data/SQLite
 // Package: SQLite
 // Module:  Binder
@@ -67,7 +65,7 @@ public:
 	void bind(std::size_t pos, const Poco::UInt64 &val, Direction dir);
 		/// Binds an UInt64.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	void bind(std::size_t pos, const long &val, Direction dir);
 		/// Binds a long
 

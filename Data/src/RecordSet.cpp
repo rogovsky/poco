@@ -1,8 +1,6 @@
 //
 // RecordSet.cpp
 //
-// $Id: //poco/Main/Data/src/RecordSet.cpp#2 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RecordSet
@@ -71,6 +69,17 @@ RecordSet::RecordSet(const RecordSet& other):
 }
 
 
+RecordSet::RecordSet(RecordSet&& other) noexcept:
+	Statement(std::move(other)),
+	_currentRow(std::move(other._currentRow)),
+	_pBegin(std::move(other._pBegin)),
+	_pEnd(std::move(other._pEnd)),
+	_pFilter(std::move(other._pFilter)),
+	_totalRowCount(std::move(other._totalRowCount))
+{
+}
+
+
 RecordSet::~RecordSet()
 {
 	try
@@ -86,6 +95,19 @@ RecordSet::~RecordSet()
 	{
 		poco_unexpected();
 	}
+}
+
+
+RecordSet& RecordSet::operator = (RecordSet&& other) noexcept
+{
+	Statement::operator = (std::move(other));
+	_currentRow = std::move(other._currentRow);
+	_pBegin = std::move(other._pBegin);
+	_pEnd = std::move(other._pEnd);
+	_pFilter = std::move(other._pFilter);
+	_totalRowCount = std::move(other._totalRowCount);
+
+	return *this;
 }
 
 

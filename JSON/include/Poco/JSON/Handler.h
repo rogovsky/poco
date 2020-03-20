@@ -1,8 +1,6 @@
 //
 // Handler.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Handler
@@ -38,7 +36,7 @@ class JSON_API Handler
 	/// parser would handle XML.
 {
 public:
-	typedef SharedPtr<Handler> Ptr;
+	using Ptr = SharedPtr<Handler>;
 
 	Handler();
 		/// Creates an empty Handler.

@@ -1,8 +1,6 @@
 //
 // AutoTransaction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AutoTransaction.h#2 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AutoTransaction
@@ -28,7 +26,7 @@ namespace Poco {
 namespace Data {
 
 
-typedef Transaction AutoTransaction;
+using AutoTransaction = Transaction;
 
 
 } } // namespace Poco::Data

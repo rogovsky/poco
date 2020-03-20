@@ -1,8 +1,6 @@
 //
 // XMLConfigurationTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/XMLConfigurationTest.h#2 $
-//
 // Definition of the XMLConfigurationTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -40,7 +38,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
+	virtual Poco::Util::AbstractConfiguration::Ptr allocConfiguration() const;
 };
 
 

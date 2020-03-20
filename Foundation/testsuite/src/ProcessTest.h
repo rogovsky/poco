@@ -1,8 +1,6 @@
 //
 // ProcessTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ProcessTest.h#2 $
-//
 // Definition of the ProcessTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -26,6 +24,7 @@ public:
 	ProcessTest(const std::string& name);
 	~ProcessTest();
 
+	void testEscapeArgs();
 	void testLaunch();
 	void testLaunchRedirectIn();
 	void testLaunchRedirectOut();

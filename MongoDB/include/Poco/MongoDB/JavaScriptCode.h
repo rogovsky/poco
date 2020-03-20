@@ -1,8 +1,6 @@
 //
 // JavaScriptCode.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  JavaScriptCode
@@ -35,7 +33,7 @@ class MongoDB_API JavaScriptCode
 	/// Represents JavaScript type in BSON.
 {
 public:
-	typedef SharedPtr<JavaScriptCode> Ptr;
+	using Ptr = SharedPtr<JavaScriptCode>;
 
 	JavaScriptCode();
 		/// Creates an empty JavaScriptCode object.

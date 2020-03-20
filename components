@@ -1,6 +1,6 @@
 CppUnit
-CppUnit/WinTestRunner
 Foundation
+Encodings
 XML
 JSON
 Util
@@ -12,11 +12,14 @@ Data
 Data/SQLite
 Data/ODBC
 Data/MySQL
+Data/PostgreSQL
 Zip
 PageCompiler
 PageCompiler/File2Page
+JWT
 PDF
 CppParser
 MongoDB
+Redis
 PocoDoc
 ProGen

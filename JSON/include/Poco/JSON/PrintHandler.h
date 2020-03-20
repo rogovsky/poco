@@ -1,8 +1,6 @@
 //
 // PrintHandler.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  PrintHandler
@@ -22,6 +20,7 @@
 
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Handler.h"
+#include "Poco/JSONString.h"
 
 
 namespace Poco {
@@ -35,14 +34,14 @@ class JSON_API PrintHandler: public Handler
 	/// otherwise, the proper indentation is applied to elements.
 {
 public:
-	typedef SharedPtr<PrintHandler> Ptr;
+	using Ptr = SharedPtr<PrintHandler>;
 
 	static const unsigned JSON_PRINT_FLAT = 0;
 
-	PrintHandler(unsigned indent = 0);
+	PrintHandler(unsigned indent = 0, int options = Poco::JSON_WRAP_STRINGS);
 		/// Creates the PrintHandler.
 
-	PrintHandler(std::ostream& out, unsigned indent = 0);
+	PrintHandler(std::ostream& out, unsigned indent = 0, int options = Poco::JSON_WRAP_STRINGS);
 		/// Creates the PrintHandler.
 
 	~PrintHandler();
@@ -115,6 +114,7 @@ private:
 	std::string   _tab;
 	int           _array;
 	bool          _objStart;
+	int           _options;
 };
 
 

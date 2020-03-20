@@ -1,8 +1,6 @@
 //
 // TaskManager.cpp
 //
-// $Id: //poco/1.4/Foundation/src/TaskManager.cpp#1 $
-//
 // Library: Foundation
 // Package: Tasks
 // Module:  Tasks
@@ -69,9 +67,9 @@ void TaskManager::cancelAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	for (TaskList::iterator it = _taskList.begin(); it != _taskList.end(); ++it)
+	for (auto& pTask: _taskList)
 	{
-		(*it)->cancel();
+		pTask->cancel();
 	}
 }
 

@@ -1,8 +1,6 @@
 //
 // File_WIN32U.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_WINCE.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File
@@ -279,25 +277,37 @@ void FileImpl::setExecutableImpl(bool flag)
 }
 
 
-void FileImpl::copyToImpl(const std::string& path) const
+void FileImpl::copyToImpl(const std::string& path, int options) const
 {
 	poco_assert (!_path.empty());
 
 	std::wstring upath;
 	convertPath(path, upath);
-	if (CopyFileW(_upath.c_str(), upath.c_str(), FALSE) == 0)
+	if (CopyFileW(_upath.c_str(), upath.c_str(), (options & OPT_FAIL_ON_OVERWRITE_IMPL) != 0) == 0)
 		handleLastErrorImpl(_path);
 }
 
 
-void FileImpl::renameToImpl(const std::string& path)
+void FileImpl::renameToImpl(const std::string& path, int options)
 {
 	poco_assert (!_path.empty());
 
 	std::wstring upath;
 	convertPath(path, upath);
-	if (MoveFileW(_upath.c_str(), upath.c_str()) == 0)
-		handleLastErrorImpl(_path);
+	if (options & OPT_FAIL_ON_OVERWRITE_IMPL) {
+		if (MoveFileW(_upath.c_str(), upath.c_str()) == 0)
+			handleLastErrorImpl(_path);
+	} else {
+		if (MoveFileW(_upath.c_str(), upath.c_str(), MOVEFILE_REPLACE_EXISTING) == 0)
+			handleLastErrorImpl(_path);
+	}
+	
+}
+
+
+void FileImpl::linkToImpl(const std::string& path, int type) const
+{
+	throw Poco::NotImplementedException("File::linkTo() is not available on this platform");
 }
 
 
@@ -345,6 +355,39 @@ bool FileImpl::createDirectoryImpl()
 	if (CreateDirectoryW(_upath.c_str(), 0) == 0)
 		handleLastErrorImpl(_path);
 	return true;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	ULARGE_INTEGER space;
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), NULL, &space, NULL))
+		handleLastErrorImpl(_path);
+	return space.QuadPart;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	ULARGE_INTEGER space;
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), &space, NULL, NULL))
+		handleLastErrorImpl(_path);
+	return space.QuadPart;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	ULARGE_INTEGER space;
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), NULL, NULL, &space))
+		handleLastErrorImpl(_path);
+	return space.QuadPart;
 }
 
 

@@ -1,8 +1,6 @@
 //
 // SesssionHandle.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/SessionHandle.cpp#1 $
-//
 // Library: Data/MySQL
 // Package: MySQL
 // Module:  SessionHandle
@@ -19,6 +17,11 @@
 #include "Poco/SingletonHolder.h"
 #ifdef POCO_OS_FAMILY_UNIX
 #include <pthread.h>
+#endif
+
+
+#if LIBMYSQL_VERSION_ID >= 80000
+typedef bool my_bool; // Workaround to make library work with MySQL client 8.0 as well as earlier versions
 #endif
 
 
@@ -39,23 +42,23 @@ public:
 		if (pthread_key_create(&_key, &ThreadCleanupHelper::cleanup) != 0)
 			throw Poco::SystemException("cannot create TLS key for mysql cleanup");
 	}
-	
+
 	void init()
 	{
 		if (pthread_setspecific(_key, reinterpret_cast<void*>(1)))
 			throw Poco::SystemException("cannot set TLS key for mysql cleanup");
 	}
-	
+
 	static ThreadCleanupHelper& instance()
 	{
 		return *_sh.get();
 	}
-	
+
 	static void cleanup(void* data)
 	{
 		mysql_thread_end();
 	}
-	
+
 private:
 	pthread_key_t _key;
 	static Poco::SingletonHolder<ThreadCleanupHelper> _sh;
@@ -178,4 +181,22 @@ void SessionHandle::rollback()
 }
 
 
-}}} // Poco::Data::MySQL
+void SessionHandle::reset()
+{
+#if ((defined (MYSQL_VERSION_ID)) && (MYSQL_VERSION_ID >= 50700)) || ((defined (MARIADB_PACKAGE_VERSION_ID)) && (MARIADB_PACKAGE_VERSION_ID >= 30000))
+	if (mysql_reset_connection(_pHandle) != 0)
+#else
+	if (mysql_refresh(_pHandle, REFRESH_TABLES | REFRESH_STATUS | REFRESH_THREADS | REFRESH_READ_LOCK) != 0)
+#endif
+		throw TransactionException("Reset connection failed.", _pHandle);
+}
+
+
+bool SessionHandle::ping()
+{
+	int rc = mysql_ping(_pHandle);
+	return rc == 0;
+}
+
+
+} } } // namespace Poco::Data::MySQL

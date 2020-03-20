@@ -1,8 +1,6 @@
 //
 // Array.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Array
@@ -33,7 +31,7 @@ class MongoDB_API Array: public Document
 	/// This class represents a BSON Array.
 {
 public:
-	typedef SharedPtr<Array> Ptr;
+	using Ptr = SharedPtr<Array>;
 
 	Array();
 		/// Creates an empty Array.

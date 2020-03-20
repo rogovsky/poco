@@ -1,8 +1,6 @@
 //
 // RegularExpression.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  RegularExpression
@@ -33,7 +31,7 @@ class MongoDB_API RegularExpression
 	/// Represents a regular expression in BSON format.
 {
 public:
-	typedef SharedPtr<RegularExpression> Ptr;
+	using Ptr = SharedPtr<RegularExpression>;
 
 	RegularExpression();
 		/// Creates an empty RegularExpression.
